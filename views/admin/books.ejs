@@ -1,0 +1,43 @@
+<%- include('../partials/admin-header') %>
+
+<div class="admin-toolbar">
+  <h1 style="margin:0;">Quản lý sách</h1>
+  <a class="btn btn-primary" href="/admin/books/create">+ Thêm sách</a>
+</div>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th><th>Tên sách</th><th>Tác giả</th><th>Thể loại</th><th>Cập nhật</th><th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% books.forEach((book) => { %>
+        <tr>
+          <td>#<%= book.id %></td>
+          <td class="wrap"><%= book.title %></td>
+          <td><%= book.author %></td>
+          <td>
+            <% (book.tags || []).forEach((tag) => { %>
+              <span class="badge badge-muted"><%= tag.name %></span>
+            <% }) %>
+          </td>
+          <td><%= new Date(book.updated_at).toLocaleDateString('vi-VN') %></td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-outline btn-sm" href="/admin/books/<%= book.id %>/edit">Sửa</a>
+              <form class="inline-form" method="POST" action="/admin/books/<%= book.id %>/delete" data-confirm="Xóa sách này và toàn bộ bình luận liên quan?">
+                <button class="btn btn-danger btn-sm" type="submit">Xóa</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/pagination') %>
+
+<%- include('../partials/admin-footer') %>

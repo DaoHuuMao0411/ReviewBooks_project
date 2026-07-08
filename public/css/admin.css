@@ -1,0 +1,138 @@
+/* Admin panel */
+
+/* Thanh nav riêng cho khu vực quản trị (đơn giản hơn nav công khai — chỉ có
+   logo + 2 nút, không có menu/search). Các class này từng dùng chung với nav
+   công khai nhưng đã tách riêng khi nav công khai đổi sang style v1. */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) clamp(20px, 4vw, 56px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-text);
+}
+.brand:hover { color: var(--color-text); }
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  color: #fbf8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.nav-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+.nav-toggle svg { width: 20px; height: 20px; }
+
+.nav-panel {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  padding-bottom: var(--space-4);
+}
+.nav-panel.is-open { display: flex; }
+
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+@media (min-width: 800px) {
+  .nav-toggle { display: none; }
+  .nav-panel {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    width: auto;
+    padding-bottom: 0;
+    flex: 1;
+    margin-left: var(--space-6);
+  }
+}
+
+.admin-sidebar {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  height: fit-content;
+}
+.admin-sidebar ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.admin-sidebar a {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+  font-size: .9rem;
+}
+.admin-sidebar a:hover, .admin-sidebar a.is-active {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+}
+
+.author-avatar-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.stat-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(2, 1fr);
+  margin-bottom: var(--space-8);
+}
+@media (min-width: 800px) {
+  .stat-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1200px) {
+  .stat-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+}
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+.stat-card .value { font-size: 1.6rem; font-weight: 700; }
+.stat-card .label { color: var(--color-text-muted); font-size: .8rem; }
+
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.inline-form { display: inline; }

@@ -1,0 +1,8 @@
+<fieldset class="star-input" data-star-input>
+  <legend class="sr-only">Điểm đánh giá</legend>
+  <% for (let i = 5; i >= 1; i--) { %>
+    <input type="radio" id="star<%= i %>" name="rating" value="<%= i %>" required>
+    <label for="star<%= i %>">&#9733;</label>
+  <% } %>
+</fieldset>
+<div class="star-input-hint" data-star-live>Chọn số sao để đánh giá</div>

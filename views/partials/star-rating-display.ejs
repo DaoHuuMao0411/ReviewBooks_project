@@ -1,0 +1,12 @@
+<%
+  const _ratingValue = Math.round(Number(locals.value || 0));
+  const _showCount = typeof locals.count !== 'undefined';
+%>
+<span class="star-display" aria-label="Đánh giá <%= locals.value || 0 %> trên 5 sao">
+  <% for (let i = 1; i <= 5; i++) { %>
+    <span class="star <%= i <= _ratingValue ? 'is-filled' : '' %>">&#9733;</span>
+  <% } %>
+  <% if (_showCount) { %>
+    <span class="count"><%= locals.value || 0 %>/5 &middot; <%= locals.count %> đánh giá</span>
+  <% } %>
+</span>
