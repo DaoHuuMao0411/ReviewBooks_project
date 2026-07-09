@@ -22,7 +22,10 @@
             <%- include('../partials/star-rating-display', { value: review.rating }) %>
           </div>
           <div class="review-item-head">
-            <span class="review-item-name"><%= review.username || review.name %></span>
+            <span class="review-item-name">
+              <%= review.username || review.name %>
+              <span class="review-item-email">(<%= review.email %>)</span>
+            </span>
             <span class="review-item-date"><%= new Date(review.created_at).toLocaleString('vi-VN') %></span>
           </div>
           <p style="margin-top: var(--space-2); margin-bottom: 0;"><%= review.content %></p>

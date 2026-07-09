@@ -96,7 +96,7 @@
             <input type="hidden" name="back" value="<%= backUrl %>">
             <p class="hint">Bình luận với tư cách <strong><%= currentUser.username %></strong> (<%= currentUser.email %>)</p>
 
-            <div class="field">
+            <div class="field rating-field">
               <label>Điểm đánh giá</label>
               <%- include('../partials/star-rating-input') %>
             </div>
@@ -122,7 +122,10 @@
             <% comments.forEach((comment) => { %>
               <div class="review-item">
                 <div class="review-item-head">
-                  <span class="review-item-name"><%= comment.username || comment.name %></span>
+                  <span class="review-item-name">
+                    <%= comment.username || comment.name %>
+                    <span class="review-item-email">(<%= comment.email %>)</span>
+                  </span>
                   <%- include('../partials/star-rating-display', { value: comment.rating }) %>
                 </div>
                 <div class="review-item-date"><%= new Date(comment.created_at).toLocaleString('vi-VN') %></div>

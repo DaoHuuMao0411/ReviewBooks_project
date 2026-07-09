@@ -120,7 +120,7 @@
 .book-detail-author { color: var(--color-text-muted); margin-bottom: var(--space-3); }
 .book-detail-meta { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); flex-wrap: wrap; }
 
-.review-form-card { max-width: 640px; }
+.review-form-card { max-width: none; }
 .community-reviews { margin-top: var(--space-6); }
 
 .review-item {
@@ -130,6 +130,7 @@
 .review-item:last-child { border-bottom: none; }
 .review-item-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-1); }
 .review-item-name { font-weight: 600; }
+.review-item-email { font-weight: 400; color: var(--color-text-muted); font-size: .8rem; margin-left: 4px; }
 .review-item-date { color: var(--color-text-muted); font-size: .8rem; }
 
 .reviews-feed-item {
