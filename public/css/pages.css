@@ -132,6 +132,53 @@
 .review-item-name { font-weight: 600; }
 .review-item-email { font-weight: 400; color: var(--color-text-muted); font-size: .8rem; margin-left: 4px; }
 .review-item-date { color: var(--color-text-muted); font-size: .8rem; }
+.review-item-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
+
+.comment-menu { position: relative; }
+.comment-menu-btn {
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.comment-menu-btn:hover { background: var(--color-bg-subtle); color: var(--color-text); }
+.comment-menu-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 140px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-1);
+  z-index: 10;
+}
+.comment-menu-dropdown form { margin: 0; }
+.comment-menu-item {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  font-size: .9rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.comment-menu-item:hover { background: var(--color-bg-subtle); }
+.comment-menu-item-danger { color: var(--color-danger); }
+
+.comment-edit-form { margin-top: var(--space-3); }
+.comment-edit-form textarea { min-height: 80px; }
+.comment-edit-form-actions { display: flex; justify-content: flex-end; gap: var(--space-2); }
 
 .reviews-feed-item {
   display: grid;
@@ -219,8 +266,14 @@
 }
 .sidebar-list a.is-active .sidebar-count { color: inherit; }
 
-@media (min-width: 800px) {
+@media (min-width: 1000px) {
   .explore-main .filter-bar { grid-template-columns: minmax(220px, 1fr) 190px auto; }
+}
+
+.mobile-category-field { display: none; }
+@media (max-width: 999px) {
+  .explore-sidebar { display: none; }
+  .mobile-category-field { display: block; }
 }
 
 .tag-row {

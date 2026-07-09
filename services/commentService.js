@@ -27,6 +27,15 @@ async function createComment({ bookId, userId, name, email, content, rating }) {
   );
 }
 
+async function getCommentById(id) {
+  const [rows] = await db.query('SELECT * FROM comments WHERE id = ?', [id]);
+  return rows[0];
+}
+
+async function updateComment({ id, content, rating }) {
+  await db.query('UPDATE comments SET content = ?, rating = ? WHERE id = ?', [content, rating, id]);
+}
+
 async function listAllPaginated({ page, perPage = 10 }) {
   const [[countRow]] = await db.query(`
     SELECT COUNT(*) AS total FROM comments c JOIN books b ON b.id = c.book_id
@@ -71,6 +80,8 @@ module.exports = {
   listForBook,
   getRatingStats,
   createComment,
+  getCommentById,
+  updateComment,
   listAllPaginated,
   listReviewsFeed,
   deleteComment

@@ -25,10 +25,18 @@
     </div>
 
     <form class="filter-bar" method="GET" action="/books">
-      <input type="hidden" name="category" value="<%= category %>">
       <div class="field" style="margin-bottom:0;">
         <label for="search">Tìm kiếm</label>
         <input type="search" id="search" name="search" placeholder="Tên sách, tác giả..." value="<%= search %>">
+      </div>
+      <div class="field mobile-category-field" style="margin-bottom:0;">
+        <label for="category">Thể loại</label>
+        <select id="category" name="category">
+          <option value="" <%= !category ? 'selected' : '' %>>Tất cả</option>
+          <% categories.forEach((cat) => { %>
+            <option value="<%= cat.name %>" <%= category === cat.name ? 'selected' : '' %>><%= cat.name %> (<%= cat.book_count %>)</option>
+          <% }) %>
+        </select>
       </div>
       <div class="field" style="margin-bottom:0;">
         <label for="sort">Sắp xếp</label>

@@ -26,7 +26,7 @@
               <%= review.username || review.name %>
               <span class="review-item-email">(<%= review.email %>)</span>
             </span>
-            <span class="review-item-date"><%= new Date(review.created_at).toLocaleString('vi-VN') %></span>
+            <span class="review-item-date"><%= new Date(review.created_at).toLocaleTimeString('vi-VN') %> &middot; <%= new Date(review.created_at).toLocaleDateString('vi-VN') %></span>
           </div>
           <p style="margin-top: var(--space-2); margin-bottom: 0;"><%= review.content %></p>
         </div>

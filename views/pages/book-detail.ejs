@@ -126,10 +126,44 @@
                     <%= comment.username || comment.name %>
                     <span class="review-item-email">(<%= comment.email %>)</span>
                   </span>
+
+                  <% if (currentUser && String(comment.user_id) === String(currentUser.id)) { %>
+                    <div class="comment-menu" data-comment-menu>
+                      <button type="button" class="comment-menu-btn" data-comment-menu-toggle aria-haspopup="true" aria-expanded="false" aria-label="Tùy chọn bình luận">&#8943;</button>
+                      <div class="comment-menu-dropdown" data-comment-menu-dropdown hidden>
+                        <button type="button" class="comment-menu-item" data-comment-edit-toggle>Chỉnh sửa</button>
+                        <form method="POST" action="/books/<%= book.id %>/comments/<%= comment.id %>/delete" data-confirm="Xóa bình luận này?">
+                          <input type="hidden" name="back" value="<%= backUrl %>">
+                          <button type="submit" class="comment-menu-item comment-menu-item-danger">Xóa</button>
+                        </form>
+                      </div>
+                    </div>
+                  <% } %>
+                </div>
+
+                <div class="review-item-meta">
+                  <span class="review-item-date"><%= new Date(comment.created_at).toLocaleTimeString('vi-VN') %> &middot; <%= new Date(comment.created_at).toLocaleDateString('vi-VN') %></span>
                   <%- include('../partials/star-rating-display', { value: comment.rating }) %>
                 </div>
-                <div class="review-item-date"><%= new Date(comment.created_at).toLocaleString('vi-VN') %></div>
+
                 <p style="margin-top: var(--space-2);"><%= comment.content %></p>
+
+                <% if (currentUser && String(comment.user_id) === String(currentUser.id)) { %>
+                  <form class="comment-edit-form" data-comment-edit-form hidden method="POST" action="/books/<%= book.id %>/comments/<%= comment.id %>/edit" data-validate-form novalidate>
+                    <input type="hidden" name="back" value="<%= backUrl %>">
+                    <div class="field rating-field">
+                      <label>Điểm đánh giá</label>
+                      <%- include('../partials/star-rating-input', { idPrefix: `edit-${comment.id}-`, selected: comment.rating }) %>
+                    </div>
+                    <div class="field">
+                      <textarea name="content" required minlength="5" maxlength="2000"><%= comment.content %></textarea>
+                    </div>
+                    <div class="comment-edit-form-actions">
+                      <button type="button" class="btn btn-outline btn-sm" data-comment-edit-cancel>Hủy</button>
+                      <button type="submit" class="btn btn-primary btn-sm">Lưu thay đổi</button>
+                    </div>
+                  </form>
+                <% } %>
               </div>
             <% }) %>
           </div>

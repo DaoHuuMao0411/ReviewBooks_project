@@ -262,8 +262,9 @@
   }
 
   .quick-search {
-    flex: 1 1 100%;
     order: -1;
+    flex: 1 1 120px;
+    min-width: 0;
     background: #fffdf8;
     border-color: #ded1bd;
   }
@@ -272,8 +273,15 @@
   .quick-search:hover input,
   .quick-search:focus-within input {
     width: 100%;
+    min-width: 0;
     padding: 7px 8px;
     opacity: 1;
+  }
+
+  .header-actions .small-button,
+  .header-actions .auth-link,
+  .header-actions form {
+    flex-shrink: 0;
   }
 }
 

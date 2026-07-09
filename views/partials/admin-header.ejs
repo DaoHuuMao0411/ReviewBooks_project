@@ -13,22 +13,17 @@
 </head>
 <body>
 <header class="site-header">
-  <div class="navbar">
-    <a class="brand" href="/admin/dashboard">
-      <span class="brand-mark">RB</span>
-      <span>Quản trị ReviewBooks</span>
-    </a>
-    <button class="nav-toggle" type="button" data-nav-toggle aria-label="Mở menu" aria-expanded="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-    <div class="nav-panel" data-nav-panel>
-      <div class="nav-auth">
-        <a class="btn btn-outline btn-sm" href="/">Xem trang người dùng</a>
-        <form action="/logout" method="POST">
-          <button class="btn btn-outline btn-sm" type="submit">Đăng xuất</button>
-        </form>
-      </div>
-    </div>
+  <a class="logo-pill" href="/admin/dashboard">
+    <img src="/images/logo.svg" alt="">
+    <span class="logo-text">ReviewBooks</span>
+  </a>
+  <span class="admin-tag">Quản trị</span>
+
+  <div class="header-actions">
+    <a class="small-button" href="/">Xem trang người dùng</a>
+    <form action="/logout" method="POST">
+      <button class="small-button" type="submit">Đăng xuất</button>
+    </form>
   </div>
 </header>
 <main>

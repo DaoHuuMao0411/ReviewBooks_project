@@ -137,6 +137,48 @@ router.post('/books/:id/comments', requireLogin, async (req, res, next) => {
   }
 });
 
+router.post('/books/:id/comments/:commentId/edit', requireLogin, async (req, res, next) => {
+  try {
+    const backQs = safeNextUrl(req.body.back) ? `?back=${encodeURIComponent(safeNextUrl(req.body.back))}` : '';
+    const comment = await commentService.getCommentById(req.params.commentId);
+
+    if (!comment || String(comment.book_id) !== String(req.params.id) || String(comment.user_id) !== String(req.session.user.id)) {
+      setFlash(req, 'error', 'Bạn không có quyền sửa bình luận này.');
+      return res.redirect(`/books/${req.params.id}${backQs}#reviews`);
+    }
+
+    const { errors, values } = validateComment(req.body);
+    if (errors.length) {
+      setFlash(req, 'error', errors.join(' '));
+      return res.redirect(`/books/${req.params.id}${backQs}#reviews`);
+    }
+
+    await commentService.updateComment({ id: comment.id, content: values.content, rating: values.rating });
+    setFlash(req, 'success', 'Đã cập nhật bình luận.');
+    res.redirect(`/books/${req.params.id}${backQs}#reviews`);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/books/:id/comments/:commentId/delete', requireLogin, async (req, res, next) => {
+  try {
+    const backQs = safeNextUrl(req.body.back) ? `?back=${encodeURIComponent(safeNextUrl(req.body.back))}` : '';
+    const comment = await commentService.getCommentById(req.params.commentId);
+
+    if (!comment || String(comment.book_id) !== String(req.params.id) || String(comment.user_id) !== String(req.session.user.id)) {
+      setFlash(req, 'error', 'Bạn không có quyền xóa bình luận này.');
+      return res.redirect(`/books/${req.params.id}${backQs}#reviews`);
+    }
+
+    await commentService.deleteComment(comment.id);
+    setFlash(req, 'success', 'Đã xóa bình luận.');
+    res.redirect(`/books/${req.params.id}${backQs}#reviews`);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/contact', (req, res) => {
   res.render('pages/contact', {
     title: 'Giới thiệu và liên hệ',
