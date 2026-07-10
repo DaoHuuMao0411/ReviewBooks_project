@@ -1,0 +1,20 @@
+<% users.forEach((user) => { %>
+  <tr>
+    <td>#<%= user.id %></td>
+    <td><%= user.username %></td>
+    <td><%= user.email %></td>
+    <td><span class="badge <%= user.role === 'admin' ? '' : 'badge-muted' %>"><%= user.role === 'admin' ? 'Quản trị viên' : 'Người dùng' %></span></td>
+    <td><span class="status-dot <%= user.is_online ? 'is-online' : '' %>"><%= user.is_online ? 'Đang online' : 'Ngoại tuyến' %></span></td>
+    <td><%= new Date(user.created_at).toLocaleDateString('vi-VN') %></td>
+    <td>
+      <div class="row-actions">
+        <a class="btn btn-outline btn-sm" href="/admin/users/<%= user.id %>/edit">Sửa</a>
+        <% if (user.role !== 'admin') { %>
+          <form class="inline-form" method="POST" action="/admin/users/<%= user.id %>/delete" data-confirm="Xóa người dùng này?">
+            <button class="btn btn-danger btn-sm" type="submit">Xóa</button>
+          </form>
+        <% } %>
+      </div>
+    </td>
+  </tr>
+<% }) %>

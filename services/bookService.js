@@ -53,7 +53,7 @@ async function listNewest(limit = 6) {
     ${AUTHOR_JOIN}
     LEFT JOIN comments c ON c.book_id = b.id
     GROUP BY b.id
-    ORDER BY b.created_at DESC
+    ORDER BY b.created_at DESC, b.id ASC
     LIMIT ?
   `, [limit]);
   return attachTags(books);
@@ -79,9 +79,13 @@ async function searchBooks({ search = '', category = '', sort = 'newest', page, 
   const [[countRow]] = await db.query(`SELECT COUNT(*) AS total FROM books b ${AUTHOR_JOIN} ${whereSql}`, params);
   const pagination = paginate({ page, totalItems: countRow.total, perPage });
 
-  let orderSql = 'ORDER BY b.created_at DESC';
-  if (sort === 'rating') orderSql = 'ORDER BY average_rating DESC, b.created_at DESC';
-  else if (sort === 'title') orderSql = 'ORDER BY b.title ASC';
+  // Luôn thêm b.id làm tiêu chí phân biệt cuối cùng — nhiều sách có thể trùng
+  // created_at/rating (vd. seed cùng lúc), nếu không có id, MySQL không đảm bảo
+  // thứ tự ổn định giữa các lần LIMIT/OFFSET riêng biệt, gây trùng/sót dòng khi
+  // phân trang hoặc infinite scroll.
+  let orderSql = 'ORDER BY b.created_at DESC, b.id ASC';
+  if (sort === 'rating') orderSql = 'ORDER BY average_rating DESC, b.created_at DESC, b.id ASC';
+  else if (sort === 'title') orderSql = 'ORDER BY b.title ASC, b.id ASC';
 
   const [books] = await db.query(`
     SELECT ${RATING_SELECT}
@@ -121,7 +125,7 @@ async function getRelatedBooks(bookId, limit = 6) {
     WHERE b.id != ?
       AND bc.category_id IN (SELECT category_id FROM book_categories WHERE book_id = ?)
     GROUP BY b.id, b.title, b.cover_image
-    ORDER BY created_at DESC
+    ORDER BY created_at DESC, b.id ASC
     LIMIT ?
   `, [bookId, bookId, limit]);
 
@@ -133,23 +137,49 @@ async function getRelatedBooks(bookId, limit = 6) {
     SELECT id, title, cover_image
     FROM books
     WHERE id NOT IN (${placeholders})
-    ORDER BY created_at DESC
+    ORDER BY created_at DESC, id ASC
     LIMIT ?
   `, [...excludeIds, limit - related.length]);
 
   return [...related, ...fallback];
 }
 
-async function listAllForAdmin({ page, perPage = 8 }) {
-  const [[countRow]] = await db.query('SELECT COUNT(*) AS total FROM books');
+async function listAllForAdmin({ search = '', category = '', sort = 'updated', page, perPage = 10 }) {
+  let whereSql = 'WHERE 1 = 1';
+  const params = [];
+
+  if (search) {
+    whereSql += ' AND (b.title LIKE ? OR a.name LIKE ?)';
+    params.push(`%${search}%`, `%${search}%`);
+  }
+  if (category) {
+    whereSql += ` AND EXISTS (
+      SELECT 1 FROM book_categories bc
+      JOIN categories cat ON cat.id = bc.category_id
+      WHERE bc.book_id = b.id AND cat.name = ?
+    )`;
+    params.push(category);
+  }
+
+  const [[countRow]] = await db.query(`SELECT COUNT(*) AS total FROM books b ${AUTHOR_JOIN} ${whereSql}`, params);
   const pagination = paginate({ page, totalItems: countRow.total, perPage });
+
+  // Thêm b.id làm tiêu chí phân biệt cuối cùng ở mọi kiểu sắp xếp — bắt buộc để
+  // infinite scroll không bị trùng/sót dòng khi nhiều sách trùng giá trị sắp xếp
+  // (vd. 28/30 sách seed cùng lúc nên trùng hệt updated_at).
+  let orderSql = 'ORDER BY b.updated_at DESC, b.created_at DESC, b.id ASC';
+  if (sort === 'title') orderSql = 'ORDER BY b.title ASC, b.id ASC';
+  else if (sort === 'newest') orderSql = 'ORDER BY b.created_at DESC, b.id ASC';
+  else if (sort === 'author') orderSql = 'ORDER BY a.name ASC, b.title ASC, b.id ASC';
+
   const [books] = await db.query(
     `SELECT b.*, a.name AS author
      FROM books b
      ${AUTHOR_JOIN}
-     ORDER BY b.updated_at DESC, b.created_at DESC
+     ${whereSql}
+     ${orderSql}
      LIMIT ? OFFSET ?`,
-    [pagination.perPage, pagination.offset]
+    [...params, pagination.perPage, pagination.offset]
   );
   await attachTags(books);
   return { books, pagination };

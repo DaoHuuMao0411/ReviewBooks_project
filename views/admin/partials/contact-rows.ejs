@@ -1,0 +1,9 @@
+<% contacts.forEach((contact) => { %>
+  <tr>
+    <td><%= contact.name %></td>
+    <td><%= contact.email %></td>
+    <td><%= contact.subject %></td>
+    <td class="wrap"><%= contact.message %></td>
+    <td><%= new Date(contact.created_at).toLocaleDateString('vi-VN') %></td>
+  </tr>
+<% }) %>

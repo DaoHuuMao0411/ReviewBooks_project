@@ -7,20 +7,18 @@
     <thead>
       <tr><th>Họ tên</th><th>Email</th><th>Tiêu đề</th><th>Nội dung</th><th>Ngày</th></tr>
     </thead>
-    <tbody>
-      <% contacts.forEach((contact) => { %>
-        <tr>
-          <td><%= contact.name %></td>
-          <td><%= contact.email %></td>
-          <td><%= contact.subject %></td>
-          <td class="wrap"><%= contact.message %></td>
-          <td><%= new Date(contact.created_at).toLocaleDateString('vi-VN') %></td>
-        </tr>
-      <% }) %>
+    <tbody
+      data-infinite-scroll
+      data-url="/admin/contacts"
+      data-params="<%= filterQuery %>"
+      data-next-page="<%= pagination.currentPage + 1 %>"
+      data-has-more="<%= pagination.hasNext %>"
+      data-total="<%= pagination.totalItems %>"
+      data-colspan="5"
+    >
+      <%- include('partials/contact-rows', { contacts }) %>
     </tbody>
   </table>
 </div>
-
-<%- include('../partials/pagination') %>
 
 <%- include('../partials/admin-footer') %>

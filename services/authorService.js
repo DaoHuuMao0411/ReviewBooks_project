@@ -6,18 +6,22 @@ async function listAll() {
   return rows;
 }
 
-async function listPaginated({ page, perPage = 10 }) {
-  const [[countRow]] = await db.query('SELECT COUNT(*) AS total FROM authors');
+async function listPaginated({ search = '', page, perPage = 10 }) {
+  const whereSql = search ? 'WHERE a.name LIKE ?' : '';
+  const params = search ? [`%${search}%`] : [];
+
+  const [[countRow]] = await db.query(`SELECT COUNT(*) AS total FROM authors a ${whereSql}`, params);
   const pagination = paginate({ page, totalItems: countRow.total, perPage });
 
   const [authors] = await db.query(
     `SELECT a.*, COUNT(b.id) AS book_count
      FROM authors a
      LEFT JOIN books b ON b.author_id = a.id
+     ${whereSql}
      GROUP BY a.id
-     ORDER BY a.name ASC
+     ORDER BY a.name ASC, a.id ASC
      LIMIT ? OFFSET ?`,
-    [pagination.perPage, pagination.offset]
+    [...params, pagination.perPage, pagination.offset]
   );
 
   return { authors, pagination };

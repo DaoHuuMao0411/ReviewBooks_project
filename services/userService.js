@@ -2,17 +2,30 @@ const db = require('../config/db');
 const { hashPassword } = require('../utils/password');
 const { paginate } = require('../utils/pagination');
 
-async function listPaginated({ page, perPage = 10 }) {
-  const [[countRow]] = await db.query('SELECT COUNT(*) AS total FROM users');
+async function listPaginated({ search = '', role = '', page, perPage = 10 }) {
+  let whereSql = 'WHERE 1 = 1';
+  const params = [];
+
+  if (search) {
+    whereSql += ' AND (username LIKE ? OR email LIKE ?)';
+    params.push(`%${search}%`, `%${search}%`);
+  }
+  if (role) {
+    whereSql += ' AND role = ?';
+    params.push(role);
+  }
+
+  const [[countRow]] = await db.query(`SELECT COUNT(*) AS total FROM users ${whereSql}`, params);
   const pagination = paginate({ page, totalItems: countRow.total, perPage });
 
   const [rows] = await db.query(
     `SELECT id, username, email, role, last_seen_at, created_at,
       CASE WHEN last_seen_at IS NOT NULL AND last_seen_at >= (NOW() - INTERVAL 5 MINUTE) THEN 1 ELSE 0 END AS is_online
      FROM users
-     ORDER BY created_at DESC
+     ${whereSql}
+     ORDER BY created_at DESC, id ASC
      LIMIT ? OFFSET ?`,
-    [pagination.perPage, pagination.offset]
+    [...params, pagination.perPage, pagination.offset]
   );
 
   return { users: rows, pagination };

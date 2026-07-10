@@ -34,8 +34,21 @@ function buildPageUrl(req, page) {
   return `${req.path}${qs ? `?${qs}` : ''}`;
 }
 
+// Querystring hiện tại (search/filter/sort...) nhưng bỏ "page" — dùng để infinite
+// scroll tự ghép "&page=N" khi tải thêm, không lặp lại tham số page cũ.
+function buildFilterQuery(req, extra = {}) {
+  const params = { ...req.query, ...extra };
+  delete params.page;
+  const qs = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') qs.set(key, value);
+  });
+  return qs.toString();
+}
+
 module.exports = {
   paginate,
   getPagination,
-  buildPageUrl
+  buildPageUrl,
+  buildFilterQuery
 };
