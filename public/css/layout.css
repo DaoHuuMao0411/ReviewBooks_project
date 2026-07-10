@@ -195,20 +195,29 @@
 .account-dropdown {
   display: none;
   position: absolute;
-  top: calc(100% + 8px);
+  /* top: 100% (không cách) + padding-top thay cho khoảng cách trực quan: nếu dùng
+     top: calc(100% + 8px) thì 8px đó là vùng trống nằm ngoài .account-dropdown,
+     chuột đi chéo từ nút xuống sẽ rời khỏi .account-menu giữa chừng và hover bị
+     ngắt trước khi tới được menu. Đưa khoảng cách vào bên trong (padding-top) để
+     vùng có thể hover luôn liền mạch từ nút tới menu. */
+  top: 100%;
   right: 0;
-  min-width: 168px;
-  background: #fbf8f0;
-  border: 1px solid #ded1bd;
-  border-radius: 10px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, .22);
-  padding: 6px;
+  padding-top: 8px;
   z-index: 200;
 }
 
 .account-menu:hover .account-dropdown,
 .account-menu.is-open .account-dropdown {
   display: block;
+}
+
+.account-dropdown-inner {
+  min-width: 168px;
+  background: #fbf8f0;
+  border: 1px solid #ded1bd;
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .22);
+  padding: 6px;
 }
 
 .account-dropdown form {

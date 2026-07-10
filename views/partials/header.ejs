@@ -53,10 +53,12 @@
           </svg>
         </button>
         <div class="account-dropdown" data-account-dropdown>
-          <a href="/account">Tài khoản</a>
-          <form action="/logout" method="POST">
-            <button type="submit">Đăng xuất</button>
-          </form>
+          <div class="account-dropdown-inner">
+            <a href="/account">Tài khoản</a>
+            <form action="/logout" method="POST">
+              <button type="submit">Đăng xuất</button>
+            </form>
+          </div>
         </div>
       </div>
     <% } else { %>
