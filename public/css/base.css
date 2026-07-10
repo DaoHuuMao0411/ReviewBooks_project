@@ -49,6 +49,20 @@
 
 * , *::before, *::after { box-sizing: border-box; }
 
+/* <button> không tự kế thừa font/line-height của trang như các thẻ khác (mặc định
+   trình duyệt dùng font hệ thống riêng, vd. Arial trên Windows) — nếu không reset,
+   nút bấm sẽ có chiều cao khác với link/thẻ khác dùng chung class .btn (vd. nút Xóa
+   thấp hơn nút Sửa dù cùng padding/font-size). Firefox còn thêm viền focus ẩn bên
+   trong nút, cũng cần bỏ để độ cao nút khớp chính xác giữa các trình duyệt. */
+button {
+  font: inherit;
+  margin: 0;
+}
+button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
 html { scroll-behavior: smooth; }
 
 body {

@@ -31,24 +31,15 @@ function buildPageUrl(req, page) {
   const query = new URLSearchParams(req.query || {});
   query.set('page', String(page));
   const qs = query.toString();
-  return `${req.path}${qs ? `?${qs}` : ''}`;
-}
-
-// Querystring hiện tại (search/filter/sort...) nhưng bỏ "page" — dùng để infinite
-// scroll tự ghép "&page=N" khi tải thêm, không lặp lại tham số page cũ.
-function buildFilterQuery(req, extra = {}) {
-  const params = { ...req.query, ...extra };
-  delete params.page;
-  const qs = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') qs.set(key, value);
-  });
-  return qs.toString();
+  // req.baseUrl là phần tiền tố router được mount (vd. "/admin"), req.path là phần
+  // còn lại sau tiền tố đó — phải ghép cả 2 mới ra đúng đường dẫn đầy đủ. Nếu chỉ
+  // dùng req.path, route được mount qua app.use('/admin', ...) sẽ mất tiền tố
+  // "/admin" (Express tự bỏ nó khi router con đọc req.path).
+  return `${req.baseUrl}${req.path}${qs ? `?${qs}` : ''}`;
 }
 
 module.exports = {
   paginate,
   getPagination,
-  buildPageUrl,
-  buildFilterQuery
+  buildPageUrl
 };

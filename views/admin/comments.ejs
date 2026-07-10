@@ -27,18 +27,25 @@
     <thead>
       <tr><th>Sách</th><th>Người dùng</th><th>Nội dung</th><th>Điểm</th><th>Ngày</th><th>Thao tác</th></tr>
     </thead>
-    <tbody
-      data-infinite-scroll
-      data-url="/admin/comments"
-      data-params="<%= filterQuery %>"
-      data-next-page="<%= pagination.currentPage + 1 %>"
-      data-has-more="<%= pagination.hasNext %>"
-      data-total="<%= pagination.totalItems %>"
-      data-colspan="6"
-    >
-      <%- include('partials/comment-rows', { comments }) %>
+    <tbody>
+      <% comments.forEach((comment) => { %>
+        <tr>
+          <td class="wrap"><%= comment.book_title %></td>
+          <td><%= comment.username || comment.name %><br><span class="review-item-date"><%= comment.email %></span></td>
+          <td class="wrap"><%= comment.content %></td>
+          <td><%- include('../partials/star-rating-display', { value: comment.rating }) %></td>
+          <td><%= new Date(comment.created_at).toLocaleDateString('vi-VN') %></td>
+          <td>
+            <form method="POST" action="/admin/comments/<%= comment.id %>/delete" data-confirm="Xóa bình luận này?">
+              <button class="btn btn-danger btn-sm" type="submit">Xóa</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
     </tbody>
   </table>
 </div>
+
+<%- include('../partials/pagination') %>
 
 <%- include('../partials/admin-footer') %>

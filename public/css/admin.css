@@ -96,13 +96,6 @@
 
 .inline-form { display: inline; }
 
-.infinite-status td {
-  text-align: center;
-  padding: var(--space-4);
-  color: var(--color-text-muted);
-  font-size: .85rem;
-}
-
 .admin-filter-bar {
   display: grid;
   gap: var(--space-3);

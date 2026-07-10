@@ -1,6 +1,6 @@
 const express = require('express');
 const adminOnly = require('../../middleware/adminOnly');
-const { buildPageUrl, buildFilterQuery } = require('../../utils/pagination');
+const { buildPageUrl } = require('../../utils/pagination');
 const { validateBook, validateAuthor, validateUser, validateCategoryName } = require('../../utils/validation');
 const { setFlash } = require('../../middleware/flash');
 const bookService = require('../../services/bookService');
@@ -13,20 +13,6 @@ const statsService = require('../../services/statsService');
 
 const router = express.Router();
 router.use(adminOnly);
-
-// Infinite scroll: khi JS gọi tải thêm, chỉ trả về đúng các dòng <tr> mới,
-// kèm header X-Has-More để client biết còn dữ liệu để tải tiếp hay không.
-function isPartialRequest(req) {
-  return req.get('X-Requested-With') === 'fetch-partial';
-}
-
-function sendRows(req, res, next, view, locals, hasNext) {
-  res.set('X-Has-More', hasNext ? '1' : '0');
-  res.render(view, locals, (err, html) => {
-    if (err) return next(err);
-    res.send(html);
-  });
-}
 
 router.get('/dashboard', async (req, res, next) => {
   try {
@@ -45,10 +31,6 @@ router.get('/books', async (req, res, next) => {
     const sort = req.query.sort || 'updated';
     const { books, pagination } = await bookService.listAllForAdmin({ search, category, sort, page: req.query.page, perPage: 10 });
 
-    if (isPartialRequest(req)) {
-      return sendRows(req, res, next, 'admin/partials/book-rows', { books }, pagination.hasNext);
-    }
-
     res.render('admin/books', {
       title: 'Quản lý sách',
       books,
@@ -57,7 +39,6 @@ router.get('/books', async (req, res, next) => {
       category,
       sort,
       categories: await categoryService.listAll(),
-      filterQuery: buildFilterQuery(req),
       buildPageUrl: (page) => buildPageUrl(req, page)
     });
   } catch (err) {
@@ -166,16 +147,11 @@ router.get('/authors', async (req, res, next) => {
     const search = (req.query.search || '').trim();
     const { authors, pagination } = await authorService.listPaginated({ search, page: req.query.page, perPage: 10 });
 
-    if (isPartialRequest(req)) {
-      return sendRows(req, res, next, 'admin/partials/author-rows', { authors }, pagination.hasNext);
-    }
-
     res.render('admin/authors', {
       title: 'Quản lý tác giả',
       authors,
       pagination,
       search,
-      filterQuery: buildFilterQuery(req),
       buildPageUrl: (page) => buildPageUrl(req, page)
     });
   } catch (err) {
@@ -375,17 +351,12 @@ router.get('/users', async (req, res, next) => {
     const role = (req.query.role || '').trim();
     const { users, pagination } = await userService.listPaginated({ search, role, page: req.query.page, perPage: 10 });
 
-    if (isPartialRequest(req)) {
-      return sendRows(req, res, next, 'admin/partials/user-rows', { users }, pagination.hasNext);
-    }
-
     res.render('admin/users', {
       title: 'Người dùng',
       users,
       pagination,
       search,
       role,
-      filterQuery: buildFilterQuery(req),
       buildPageUrl: (page) => buildPageUrl(req, page)
     });
   } catch (err) {
@@ -480,17 +451,12 @@ router.get('/comments', async (req, res, next) => {
     const sort = req.query.sort || 'newest';
     const { comments, pagination } = await commentService.listAllPaginated({ search, sort, page: req.query.page, perPage: 10 });
 
-    if (isPartialRequest(req)) {
-      return sendRows(req, res, next, 'admin/partials/comment-rows', { comments }, pagination.hasNext);
-    }
-
     res.render('admin/comments', {
       title: 'Bình luận',
       comments,
       pagination,
       search,
       sort,
-      filterQuery: buildFilterQuery(req),
       buildPageUrl: (page) => buildPageUrl(req, page)
     });
   } catch (err) {
@@ -513,15 +479,10 @@ router.get('/contacts', async (req, res, next) => {
   try {
     const { contacts, pagination } = await contactService.listPaginated({ page: req.query.page, perPage: 10 });
 
-    if (isPartialRequest(req)) {
-      return sendRows(req, res, next, 'admin/partials/contact-rows', { contacts }, pagination.hasNext);
-    }
-
     res.render('admin/contacts', {
       title: 'Liên hệ',
       contacts,
       pagination,
-      filterQuery: buildFilterQuery(req),
       buildPageUrl: (page) => buildPageUrl(req, page)
     });
   } catch (err) {

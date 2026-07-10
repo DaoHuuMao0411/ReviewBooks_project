@@ -81,8 +81,7 @@ async function searchBooks({ search = '', category = '', sort = 'newest', page, 
 
   // Luôn thêm b.id làm tiêu chí phân biệt cuối cùng — nhiều sách có thể trùng
   // created_at/rating (vd. seed cùng lúc), nếu không có id, MySQL không đảm bảo
-  // thứ tự ổn định giữa các lần LIMIT/OFFSET riêng biệt, gây trùng/sót dòng khi
-  // phân trang hoặc infinite scroll.
+  // thứ tự ổn định giữa các lần LIMIT/OFFSET riêng biệt (đổi trang), gây trùng/sót dòng.
   let orderSql = 'ORDER BY b.created_at DESC, b.id ASC';
   if (sort === 'rating') orderSql = 'ORDER BY average_rating DESC, b.created_at DESC, b.id ASC';
   else if (sort === 'title') orderSql = 'ORDER BY b.title ASC, b.id ASC';
@@ -165,7 +164,7 @@ async function listAllForAdmin({ search = '', category = '', sort = 'updated', p
   const pagination = paginate({ page, totalItems: countRow.total, perPage });
 
   // Thêm b.id làm tiêu chí phân biệt cuối cùng ở mọi kiểu sắp xếp — bắt buộc để
-  // infinite scroll không bị trùng/sót dòng khi nhiều sách trùng giá trị sắp xếp
+  // phân trang không bị trùng/sót dòng khi nhiều sách trùng giá trị sắp xếp
   // (vd. 28/30 sách seed cùng lúc nên trùng hệt updated_at).
   let orderSql = 'ORDER BY b.updated_at DESC, b.created_at DESC, b.id ASC';
   if (sort === 'title') orderSql = 'ORDER BY b.title ASC, b.id ASC';

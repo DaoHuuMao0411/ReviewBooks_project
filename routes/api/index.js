@@ -9,12 +9,12 @@ router.use('/contact', require('./contactApi'));
 router.use('/auth', require('./authApi'));
 
 router.use((req, res) => {
-  res.status(404).json({ error: 'API endpoint không tồn tại.' });
+  res.status(404).json({ success: false, message: 'API endpoint không tồn tại.' });
 });
 
 router.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).json({ error: 'Có lỗi xảy ra ở máy chủ.' });
+  res.status(500).json({ success: false, message: 'Có lỗi xảy ra ở máy chủ.' });
 });
 
 module.exports = router;

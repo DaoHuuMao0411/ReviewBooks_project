@@ -11,7 +11,7 @@ Xây dựng bằng Node.js + Express + EJS + CSS/JS thuần (không dùng thư v
 - MySQL Server đang chạy.
 
 ### Bước 2: Tạo database riêng cho v2
-Chạy toàn bộ nội dung [sql/001_schema_reference.sql](sql/001_schema_reference.sql) — script này tự tạo database mới tên `review_books_v2` (có `DROP DATABASE IF EXISTS review_books_v2` ở đầu nên chỉ xoá/tạo lại đúng database này, không đụng tới `review_books` của v1).
+Chạy toàn bộ nội dung [sql/database.sql](sql/database.sql) — script này tự tạo database mới tên `review_books_v2` (có `DROP DATABASE IF EXISTS review_books_v2` ở đầu nên chỉ xoá/tạo lại đúng database này, không đụng tới `review_books` của v1).
 
 ### Bước 3: Cấu hình `.env`
 Sao chép `.env.example` thành `.env` và điền thông tin kết nối MySQL của bạn:

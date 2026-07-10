@@ -21,18 +21,26 @@
     <thead>
       <tr><th></th><th>Tên tác giả</th><th>Số sách</th><th>Thao tác</th></tr>
     </thead>
-    <tbody
-      data-infinite-scroll
-      data-url="/admin/authors"
-      data-params="<%= filterQuery %>"
-      data-next-page="<%= pagination.currentPage + 1 %>"
-      data-has-more="<%= pagination.hasNext %>"
-      data-total="<%= pagination.totalItems %>"
-      data-colspan="4"
-    >
-      <%- include('partials/author-rows', { authors }) %>
+    <tbody>
+      <% authors.forEach((author) => { %>
+        <tr>
+          <td><img class="author-avatar-sm" src="<%= author.avatar %>" alt="Ảnh <%= author.name %>"></td>
+          <td class="wrap"><%= author.name %></td>
+          <td><span class="badge badge-muted"><%= author.book_count %> sách</span></td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-outline btn-sm" href="/admin/authors/<%= author.id %>/edit">Sửa</a>
+              <form class="inline-form" method="POST" action="/admin/authors/<%= author.id %>/delete" data-confirm="Xóa tác giả này? Chỉ xóa được nếu không còn sách nào gắn với tác giả.">
+                <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
     </tbody>
   </table>
 </div>
+
+<%- include('../partials/pagination') %>
 
 <%- include('../partials/admin-footer') %>

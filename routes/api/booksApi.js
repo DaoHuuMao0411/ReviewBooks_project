@@ -10,7 +10,7 @@ router.get('/', async (req, res, next) => {
   try {
     const { search = '', category = '', sort = 'newest', page } = req.query;
     const { books, pagination } = await bookService.searchBooks({ search, category, sort, page, perPage: 6 });
-    res.json({ books, pagination });
+    res.json({ success: true, data: { books, pagination } });
   } catch (err) {
     next(err);
   }
@@ -19,9 +19,9 @@ router.get('/', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const book = await bookService.getBookById(req.params.id);
-    if (!book) return res.status(404).json({ error: 'Không tìm thấy sách.' });
+    if (!book) return res.status(404).json({ success: false, message: 'Không tìm thấy sách.' });
     const rating = await commentService.getRatingStats(req.params.id);
-    res.json({ book, rating });
+    res.json({ success: true, data: { book, rating } });
   } catch (err) {
     next(err);
   }
@@ -30,9 +30,9 @@ router.get('/:id', async (req, res, next) => {
 router.get('/:id/comments', async (req, res, next) => {
   try {
     const book = await bookService.getBookById(req.params.id);
-    if (!book) return res.status(404).json({ error: 'Không tìm thấy sách.' });
+    if (!book) return res.status(404).json({ success: false, message: 'Không tìm thấy sách.' });
     const comments = await commentService.listForBook(req.params.id);
-    res.json({ comments });
+    res.json({ success: true, data: { comments } });
   } catch (err) {
     next(err);
   }
@@ -41,10 +41,10 @@ router.get('/:id/comments', async (req, res, next) => {
 router.post('/:id/comments', requireLoginApi, async (req, res, next) => {
   try {
     const book = await bookService.getBookById(req.params.id);
-    if (!book) return res.status(404).json({ error: 'Không tìm thấy sách.' });
+    if (!book) return res.status(404).json({ success: false, message: 'Không tìm thấy sách.' });
 
     const { errors, values } = validateComment(req.body);
-    if (errors.length) return res.status(400).json({ errors });
+    if (errors.length) return res.status(400).json({ success: false, message: errors.join(' ') });
 
     await commentService.createComment({
       bookId: req.params.id,
@@ -55,7 +55,7 @@ router.post('/:id/comments', requireLoginApi, async (req, res, next) => {
       rating: values.rating
     });
 
-    res.status(201).json({ ok: true });
+    res.status(201).json({ success: true });
   } catch (err) {
     next(err);
   }

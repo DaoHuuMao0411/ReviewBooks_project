@@ -111,7 +111,12 @@
   box-shadow: 0 12px 30px rgba(82, 58, 34, .08);
 }
 
-.quick-search input {
+/* input[type=search] cần chỉ định thêm thuộc tính [type="search"] chứ không chỉ
+   ".quick-search input" — nếu không, độ ưu tiên CSS bằng đúng với quy tắc dùng chung
+   "input[type=search]" trong components.css (nạp sau layout.css), khiến padding/border
+   mặc định (form field) đè lên style gọn của thanh tìm kiếm ở trạng thái bình thường,
+   chỉ đúng khi hover/focus-within có thêm độ ưu tiên từ pseudo-class mới thắng được. */
+.quick-search input[type="search"] {
   width: 230px;
   padding: 8px 10px;
   border: 0;
@@ -341,9 +346,7 @@
     border-color: #ded1bd;
   }
 
-  .quick-search input,
-  .quick-search:hover input,
-  .quick-search:focus-within input {
+  .quick-search input[type="search"] {
     width: 100%;
     min-width: 0;
     padding: 7px 8px;
