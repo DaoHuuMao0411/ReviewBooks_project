@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const { hashPassword } = require('../utils/password');
+const { hashPassword, verifyPassword } = require('../utils/password');
 const { paginate } = require('../utils/pagination');
 
 async function listPaginated({ search = '', role = '', page, perPage = 10 }) {
@@ -66,6 +66,23 @@ async function update(id, values, sessionUser) {
   }
 }
 
+async function updateUsername(id, username, sessionUser) {
+  await db.query('UPDATE users SET username = ? WHERE id = ?', [username, id]);
+
+  if (sessionUser && Number(sessionUser.id) === Number(id)) {
+    sessionUser.username = username;
+  }
+}
+
+async function changePassword(id, currentPassword, newPassword) {
+  const [rows] = await db.query('SELECT password FROM users WHERE id = ?', [id]);
+  const user = rows[0];
+  if (!user || !verifyPassword(currentPassword, user.password)) return false;
+
+  await db.query('UPDATE users SET password = ? WHERE id = ?', [hashPassword(newPassword), id]);
+  return true;
+}
+
 async function remove(id, requesterId) {
   const [rows] = await db.query('SELECT id, username, role FROM users WHERE id = ?', [id]);
   const user = rows[0];
@@ -89,5 +106,7 @@ module.exports = {
   getById,
   create,
   update,
+  updateUsername,
+  changePassword,
   remove
 };

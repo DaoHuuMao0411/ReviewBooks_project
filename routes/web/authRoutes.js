@@ -38,7 +38,7 @@ router.post('/login', async (req, res, next) => {
     }
 
     req.session.user = user;
-    setFlash(req, 'success', `Đăng nhập thành công. Xin chào ${user.username}.`);
+    req.session.justLoggedIn = true;
     if (nextUrl) return res.redirect(nextUrl);
     if (user.role === 'admin') return res.redirect('/admin/dashboard');
     return res.redirect('/');

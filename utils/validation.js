@@ -101,6 +101,30 @@ function validateUser(data, mode = 'create') {
   return { errors, values: { username, email, password, role } };
 }
 
+function validateProfileUpdate(data) {
+  const errors = [];
+  const username = clean(data.username);
+
+  if (!/^[a-zA-Z0-9_]{3,50}$/.test(username)) {
+    errors.push('Tên đăng nhập phải dài 3-50 ký tự và chỉ gồm chữ, số hoặc dấu gạch dưới.');
+  }
+
+  return { errors, values: { username } };
+}
+
+function validatePasswordChange(data) {
+  const errors = [];
+  const currentPassword = clean(data.currentPassword);
+  const newPassword = clean(data.newPassword);
+  const confirmPassword = clean(data.confirmPassword);
+
+  if (!currentPassword) errors.push('Vui lòng nhập mật khẩu hiện tại.');
+  if (newPassword.length < 6) errors.push('Mật khẩu mới phải có ít nhất 6 ký tự.');
+  if (newPassword !== confirmPassword) errors.push('Xác nhận mật khẩu mới không khớp.');
+
+  return { errors, values: { currentPassword, newPassword } };
+}
+
 function validateCategoryName(value) {
   const name = clean(value);
   const errors = [];
@@ -141,6 +165,8 @@ module.exports = {
   validateBook,
   validateAuthor,
   validateUser,
+  validateProfileUpdate,
+  validatePasswordChange,
   validateCategoryName,
   validateContact,
   validateComment

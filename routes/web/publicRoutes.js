@@ -1,6 +1,6 @@
 const express = require('express');
 const requireLogin = require('../../middleware/auth');
-const { validateContact, validateComment } = require('../../utils/validation');
+const { validateContact, validateComment, validateProfileUpdate, validatePasswordChange } = require('../../utils/validation');
 const { safeNextUrl } = require('../../utils/safeUrl');
 const { buildPageUrl } = require('../../utils/pagination');
 const { setFlash } = require('../../middleware/flash');
@@ -8,6 +8,7 @@ const bookService = require('../../services/bookService');
 const categoryService = require('../../services/categoryService');
 const commentService = require('../../services/commentService');
 const contactService = require('../../services/contactService');
+const userService = require('../../services/userService');
 
 const router = express.Router();
 
@@ -174,6 +175,53 @@ router.post('/books/:id/comments/:commentId/delete', requireLogin, async (req, r
     await commentService.deleteComment(comment.id);
     setFlash(req, 'success', 'Đã xóa bình luận.');
     res.redirect(`/books/${req.params.id}${backQs}#reviews`);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/account', requireLogin, (req, res) => {
+  res.render('pages/account', {
+    title: 'Tài khoản'
+  });
+});
+
+router.post('/account/profile', requireLogin, async (req, res, next) => {
+  try {
+    const { errors, values } = validateProfileUpdate(req.body);
+    if (errors.length) {
+      setFlash(req, 'error', errors.join(' '));
+      return res.redirect('/account');
+    }
+
+    await userService.updateUsername(req.session.user.id, values.username, req.session.user);
+    setFlash(req, 'success', 'Đã cập nhật tên hiển thị.');
+    res.redirect('/account');
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      setFlash(req, 'error', 'Tên đăng nhập đã được sử dụng.');
+      return res.redirect('/account');
+    }
+    next(err);
+  }
+});
+
+router.post('/account/password', requireLogin, async (req, res, next) => {
+  try {
+    const { errors, values } = validatePasswordChange(req.body);
+    if (errors.length) {
+      setFlash(req, 'error', errors.join(' '));
+      return res.redirect('/account');
+    }
+
+    const ok = await userService.changePassword(req.session.user.id, values.currentPassword, values.newPassword);
+    if (!ok) {
+      setFlash(req, 'error', 'Mật khẩu hiện tại không đúng.');
+      return res.redirect('/account');
+    }
+
+    setFlash(req, 'success', 'Đã đổi mật khẩu thành công.');
+    res.redirect('/account');
   } catch (err) {
     next(err);
   }
