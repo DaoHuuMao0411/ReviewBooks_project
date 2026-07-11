@@ -21,6 +21,7 @@ export default function BookDetailScreen({ route }: Props) {
   const [rating, setRatingStats] = useState<Rating | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   const [content, setContent] = useState('');
   const [selectedStar, setSelectedStar] = useState(5);
@@ -29,10 +30,15 @@ export default function BookDetailScreen({ route }: Props) {
 
   async function loadData() {
     setIsLoading(true);
+    setLoadError('');
     const [bookResult, commentsResult] = await Promise.all([getBookDetail(id), getComments(id)]);
     if (bookResult.success && bookResult.data) {
       setBook(bookResult.data.book);
       setRatingStats(bookResult.data.rating);
+    } else {
+      // Không lấy được sách (mất mạng, sai IP, server chưa chạy...) - báo lỗi
+      // rõ ràng thay vì để màn hình quay loading mãi không dừng.
+      setLoadError(bookResult.message || 'Không tải được thông tin sách.');
     }
     if (commentsResult.success && commentsResult.data) setComments(commentsResult.data.comments);
     setIsLoading(false);
@@ -61,10 +67,21 @@ export default function BookDetailScreen({ route }: Props) {
     }
   }
 
-  if (isLoading || !book) {
+  if (isLoading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator color={colors.accent} size="large" />
+      </View>
+    );
+  }
+
+  if (!book) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.paragraph}>{loadError || 'Không tải được thông tin sách.'}</Text>
+        <TouchableOpacity style={[styles.button, styles.retryButton]} onPress={loadData}>
+          <Text style={styles.buttonText}>Thử lại</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -77,7 +94,7 @@ export default function BookDetailScreen({ route }: Props) {
 
       <Text style={styles.title}>{book.title}</Text>
       <Text style={styles.author}>Tác giả: {book.author}</Text>
-      <Text style={styles.rating}>⭐ {rating ? rating.average_rating : 0} ({rating ? rating.total : 0} đánh giá)</Text>
+      <Text style={styles.rating}>⭐ {Number(rating?.average_rating || 0).toFixed(1)} ({rating ? rating.total : 0} đánh giá)</Text>
 
       {book.tags.length > 0 && (
         <Text style={styles.tags}>Thể loại: {book.tags.map((t) => t.name).join(', ')}</Text>
@@ -137,7 +154,8 @@ export default function BookDetailScreen({ route }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  center: { flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
+  center: { flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  retryButton: { marginTop: 16, paddingHorizontal: 32 },
   content: { padding: 16, paddingBottom: 40 },
   cover: { width: '100%', height: 140, backgroundColor: colors.accent, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
   coverLetter: { color: colors.bg, fontSize: 48, fontWeight: 'bold' },

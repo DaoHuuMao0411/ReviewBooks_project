@@ -32,15 +32,19 @@ export interface Book {
   author: string;
   author_avatar: string;
   author_bio: string;
-  average_rating?: number;
+  // MySQL trả AVG()/ROUND() dạng chuỗi (không phải number) qua driver mysql2 -
+  // giống hệt bên website (views/pages/index.ejs dùng Number(...).toFixed(1)
+  // để hiển thị), nên để type là string, ép kiểu bằng Number() khi hiển thị.
+  average_rating?: string;
   comment_count?: number;
   tags: Tag[];
 }
 
 // Điểm đánh giá trung bình của 1 sách, trả riêng từ GET /api/books/:id
 // (server tính bằng commentService.getRatingStats, không nằm trong "book").
+// average_rating cũng là chuỗi vì cùng lý do ROUND(AVG()) ở trên.
 export interface Rating {
-  average_rating: number;
+  average_rating: string;
   total: number;
 }
 

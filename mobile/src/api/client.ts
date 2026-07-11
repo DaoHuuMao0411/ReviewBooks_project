@@ -1,19 +1,30 @@
 import { API_BASE_URL } from '../config';
 import { ApiResponse, Book, Comment, Pagination, Rating, User } from './types';
 
+const REQUEST_TIMEOUT_MS = 10000;
+
 // Hàm dùng chung cho mọi lời gọi API - tránh lặp lại code fetch + parse JSON
 // ở từng hàm bên dưới (slide 11. Networking dạy fetch trả về Promise, dùng
 // async/await để đọc response.json()).
 async function request<T>(path: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  // Nếu server không phản hồi (vd bị treo) thì fetch sẽ chờ vô thời hạn.
+  // AbortController.abort() sau REQUEST_TIMEOUT_MS giúp thoát khỏi trạng thái
+  // chờ đó, tránh màn hình loading quay mãi không dừng.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
       credentials: 'include', // giữ cookie session đăng nhập, giống trình duyệt bên web
       headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
       ...options
     });
     return await response.json();
   } catch (err) {
     return { success: false, message: 'Không thể kết nối tới máy chủ. Vui lòng kiểm tra mạng.' };
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 

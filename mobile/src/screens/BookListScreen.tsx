@@ -15,11 +15,20 @@ export default function BookListScreen({ navigation }: Props) {
   const [books, setBooks] = useState<Book[]>([]);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   async function loadBooks(keyword: string) {
     setIsLoading(true);
     const result = await getBooks(keyword);
-    if (result.success && result.data) setBooks(result.data.books);
+    if (result.success && result.data) {
+      setBooks(result.data.books);
+      setLoadError('');
+    } else {
+      // Gọi API thất bại (mất mạng, sai IP...) - phân biệt với trường hợp
+      // tìm kiếm không ra kết quả, tránh hiểu lầm "không có sách nào".
+      setBooks([]);
+      setLoadError(result.message || 'Không tải được danh sách sách.');
+    }
     setIsLoading(false);
   }
 
@@ -44,7 +53,18 @@ export default function BookListScreen({ navigation }: Props) {
         <FlatList
           data={books}
           keyExtractor={(item) => String(item.id)}
-          ListEmptyComponent={<Text style={styles.empty}>Không tìm thấy sách nào.</Text>}
+          ListEmptyComponent={
+            loadError ? (
+              <View>
+                <Text style={styles.empty}>{loadError}</Text>
+                <TouchableOpacity style={styles.retryButton} onPress={() => loadBooks(search)}>
+                  <Text style={styles.retryButtonText}>Thử lại</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <Text style={styles.empty}>Không tìm thấy sách nào.</Text>
+            )
+          }
           renderItem={({ item }) => (
             <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('BookDetail', { id: item.id })}>
               <View style={styles.cover}>
@@ -54,7 +74,7 @@ export default function BookListScreen({ navigation }: Props) {
                 <Text style={styles.bookTitle} numberOfLines={2}>{item.title}</Text>
                 <Text style={styles.bookAuthor}>{item.author}</Text>
                 <Text style={styles.bookRating}>
-                  {'⭐'} {item.average_rating} ({item.comment_count} đánh giá)
+                  {'⭐'} {Number(item.average_rating || 0).toFixed(1)} ({item.comment_count} đánh giá)
                 </Text>
               </View>
             </TouchableOpacity>
@@ -89,6 +109,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.text,
     marginTop: 32
+  },
+  retryButton: {
+    marginTop: 16,
+    alignSelf: 'center',
+    backgroundColor: colors.accent,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 8
+  },
+  retryButtonText: {
+    color: colors.bg,
+    fontSize: 14,
+    fontWeight: 'bold'
   },
   card: {
     flexDirection: 'row',

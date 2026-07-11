@@ -30,7 +30,11 @@ export default function LoginScreen({ navigation }: Props) {
 
     if (result.success && result.data) {
       await login(result.data.user);
-      navigation.navigate('Home');
+      // Dùng goBack() thay vì navigate('Home'): màn Login luôn được mở từ Home,
+      // nên Home đã có sẵn ngay bên dưới trong stack. Nếu dùng navigate('Home')
+      // sẽ đẩy thêm 1 Home mới chồng lên, khiến bấm back sau khi đăng nhập
+      // quay lại đúng form Login cũ (dù đã đăng nhập xong).
+      navigation.goBack();
     } else {
       setError(result.message || 'Đăng nhập thất bại.');
     }

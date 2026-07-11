@@ -21,10 +21,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Đọc user đã lưu trong AsyncStorage khi mở app lại (slide 10. Data Storage)
   // để không bắt đăng nhập lại mỗi lần mở app.
+  // Bọc try/catch vì dữ liệu lưu có thể bị hỏng (không phải JSON hợp lệ) -
+  // nếu không bắt lỗi, JSON.parse sẽ throw và làm crash app ngay lúc mở lên.
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
-      if (raw) setUser(JSON.parse(raw));
-    });
+    AsyncStorage.getItem(STORAGE_KEY)
+      .then((raw) => {
+        if (raw) setUser(JSON.parse(raw));
+      })
+      .catch(() => {
+        // Dữ liệu hỏng - coi như chưa đăng nhập, xoá luôn để lần sau không lỗi lại.
+        AsyncStorage.removeItem(STORAGE_KEY);
+      });
   }, []);
 
   async function login(newUser: User) {
